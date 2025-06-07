@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web-server-proxy:
+    build:
+      context: ./web-server-proxy
+      dockerfile: Dockerfile
+    container_name: nginx-server
+    ports:
+      - "10080:80"
+      - "10443:443"
+    restart: unless-stopped
+    networks:
+      - internal-net
+
+  # dns-server:
+  #   build:
+  #     context: ./dns-server
+  #     dockerfile: Dockerfile
+  #   container_name: bind9-server
+  #   ports:
+  #     - "10053:53/udp"
+  #     - "10053:53/tcp"
+  #   restart: unless-stopped
+  #   networks:
+  #     - internal-net
+
+networks:
+  internal-net:
+    driver: bridge

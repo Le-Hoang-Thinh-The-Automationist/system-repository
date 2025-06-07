@@ -1,18 +1,65 @@
-#  Web Server On-Prem
+#  1. Web Server On-Prem
 
-## Version History
+- [1. Web Server On-Prem](#1-web-server-on-prem)
+  - [1.1. Version History](#11-version-history)
+  - [1.2. Overview](#12-overview)
+    - [1.2.1. Description](#121-description)
+    - [1.2.2. Main Objectives](#122-main-objectives)
+    - [1.2.3. Technology \& Components](#123-technology--components)
+  - [1.3. Functional Requirements](#13-functional-requirements)
+    - [1.3.1. **Web Server Core Functionality**](#131-web-server-core-functionality)
+    - [1.3.2. **DNS Server (Bind9)**](#132-dns-server-bind9)
+    - [1.3.3. **Proxy Server (Nginx)**](#133-proxy-server-nginx)
+    - [1.3.4. **Security \& SSL/TLS**](#134-security--ssltls)
+    - [1.3.5. **Monitoring \& Logging (Prometheus, ELK Stack)**](#135-monitoring--logging-prometheus-elk-stack)
+    - [1.3.6. **Performance Optimization**](#136-performance-optimization)
+    - [1.3.7. **Fault Tolerance \& High Availability**](#137-fault-tolerance--high-availability)
+    - [1.3.8. **User Authentication \& Access Control**](#138-user-authentication--access-control)
+    - [1.3.9. **Backup \& Disaster Recovery**](#139-backup--disaster-recovery)
+    - [1.3.10. **10. API Gateway \& Microservices Support**](#1310-10-api-gateway--microservices-support)
+  - [1.4. Non-functional Requirements](#14-non-functional-requirements)
+  - [1.5. System Design](#15-system-design)
+    - [1.5.1. Top Level Design](#151-top-level-design)
+    - [1.5.2. Current provided hardware, software, and others:](#152-current-provided-hardware-software-and-others)
+    - [1.5.3. Design for Objectives](#153-design-for-objectives)
+  - [1.6. Prerequisites for On-Premise Web Server Deployment](#16-prerequisites-for-on-premise-web-server-deployment)
+    - [1.6.1. **Hardware Requirements**](#161-hardware-requirements)
+    - [1.6.2. **Operating System \& Infrastructure**](#162-operating-system--infrastructure)
+    - [1.6.3. **Web Server \& Proxy Setup**](#163-web-server--proxy-setup)
+    - [1.6.4. **DNS Server Setup (Bind9)**](#164-dns-server-setup-bind9)
+    - [1.6.5. **Security \& SSL/TLS**](#165-security--ssltls)
+    - [1.6.6. **Monitoring \& Logging**](#166-monitoring--logging)
+    - [1.6.7. **Database Setup (If Required)**](#167-database-setup-if-required)
+    - [1.6.8. **Network Configuration**](#168-network-configuration)
+    - [1.6.9. **Authentication \& Access Control**](#169-authentication--access-control)
+    - [1.6.10. **Backup \& Disaster Recovery**](#1610-backup--disaster-recovery)
+  - [1.7. Implementation](#17-implementation)
+    - [1.7.1. Web Server Core Functionality](#171-web-server-core-functionality)
+    - [1.7.2. DNS Server (Bind9)](#172-dns-server-bind9)
+    - [1.7.3. Proxy Server (Nginx)](#173-proxy-server-nginx)
+    - [1.7.4. Security \& SSL/TLS](#174-security--ssltls)
+    - [1.7.5. Monitoring \& Logging (Prometheus, ELK Stack)](#175-monitoring--logging-prometheus-elk-stack)
+    - [1.7.6. Performance Optimization](#176-performance-optimization)
+    - [1.7.7. Fault Tolerance \& High Availability](#177-fault-tolerance--high-availability)
+    - [1.7.8. User Authentication \& Access Control](#178-user-authentication--access-control)
+    - [1.7.9. Backup \& Disaster Recovery](#179-backup--disaster-recovery)
+    - [1.7.10. API Gateway \& Microservices Support](#1710-api-gateway--microservices-support)
+  - [1.8. References](#18-references)
+
+
+## 1.1. Version History
 
 | Version | Release Date | Changes & Updates | Author    |
 |---------|--------------|-------------------|-----------|
 | 0.0.1   | 07 June 2025 | Initial           | L.H.Thinh |
 
-## Overview
+## 1.2. Overview
 
-### Description
+### 1.2.1. Description
 
 This documentation outlines the design and implementation of a **web server with proxy (Nginx)**, a **DNS server (Bind9)**, **SSL/TLS security**, and **Prometheus monitoring** based on **SRE principles**.
 
-### Main Objectives
+### 1.2.2. Main Objectives
 
 1. **Web Server Core Functionality**
 2. **DNS Server (Bind9)**
@@ -25,7 +72,7 @@ This documentation outlines the design and implementation of a **web server with
 9. **Backup & Disaster Recovery**
 10. **API Gateway & Microservices Support**
 
-### Technology & Components
+### 1.2.3. Technology & Components
 
 - **Web Server & Proxy**: Nginx
 - **DNS Server**: Bind9
@@ -34,9 +81,9 @@ This documentation outlines the design and implementation of a **web server with
 - **Infrastructure**: Docker, Linux
 <!-- Insert Diagram here -->
 
-## Functional Requirements
+## 1.3. Functional Requirements
 
-### **1. Web Server Core Functionality**
+### 1.3.1. **Web Server Core Functionality**
 - **Serve Web Content**: Efficiently deliver web pages, static files, and dynamic content.
 - **Reverse Proxy Support**: Handle incoming client requests and forward them to backend services.
 - **Load Balancing**: Distribute traffic across multiple servers to improve performance.
@@ -44,65 +91,65 @@ This documentation outlines the design and implementation of a **web server with
 - **Compression & Optimization**: Use **Gzip** or **Brotli** for faster content delivery.
 
 
-### **2. DNS Server (Bind9)**
+### 1.3.2. **DNS Server (Bind9)**
 - **Domain Resolution**: Convert human-readable domain names into IP addresses.
 - **Zone Management**: Support authoritative zones and forward/reverse DNS lookups.
 - **Caching & Forwarding**: Improve performance by caching DNS queries.
 - **Security Policies**: Implement **DNSSEC** for protection against spoofing and attacks.
 
 
-### **3. Proxy Server (Nginx)**
+### 1.3.3. **Proxy Server (Nginx)**
 - **Reverse Proxy**: Route requests to backend servers efficiently.
 - **Forward Proxy**: Allow clients to access external sites while hiding their IP addresses.
 - **Traffic Control**: Enforce rate limiting, request filtering, and access restrictions.
 - **SSL/TLS Termination**: Manage encrypted traffic by terminating SSL/TLS at the proxy layer.
 
 
-### **4. Security & SSL/TLS**
+### 1.3.4. **Security & SSL/TLS**
 - **SSL/TLS Encryption**: Implement HTTPS for secure communication.
 - **Certificate Management**: Use **Let's Encrypt** or enterprise solutions for automatic renewal.
 - **Firewall & Access Control**: Block unauthorized access and prevent common attacks.
 - **Intrusion Detection & Prevention**: Monitor incoming traffic for malicious activity.
 
 
-### **5. Monitoring & Logging (Prometheus, ELK Stack)**
+### 1.3.5. **Monitoring & Logging (Prometheus, ELK Stack)**
 - **Resource Usage Monitoring**: Track **CPU, RAM, Disk usage** to prevent performance bottlenecks.
 - **Traffic Analytics**: Monitor **request rates, error responses, and active connections**.
 - **Log Management**: Store and analyze logs for troubleshooting and security auditing.
 - **Automated Alerting**: Send alerts when anomalies or system failures occur.
 
 
-### **6. Performance Optimization**
+### 1.3.6. **Performance Optimization**
 - **Caching Mechanisms**: Use **Redis** or **Varnish** for faster content delivery.
 - **Load Balancing Strategies**: Implement **round-robin, least connections, or IP hashing**.
 - **Content Delivery Network (CDN)**: Optionally integrate with **Cloudflare** or **Akamai** for global scaling.
 
 
-### **7. Fault Tolerance & High Availability**
+### 1.3.7. **Fault Tolerance & High Availability**
 - **Redundant Infrastructure**: Ensure failover support in case of hardware failure.
 - **Automatic Recovery**: Detect server failures and reroute traffic to operational nodes.
 - **Database Replication**: Use **MySQL/MariaDB/PostgreSQL** replication for high availability.
 
 
-### **8. User Authentication & Access Control**
+### 1.3.8. **User Authentication & Access Control**
 - **Identity & Access Management**: Use **OAuth, LDAP, or Kerberos** for authentication.
 - **Role-Based Access Control (RBAC)**: Define permissions for different user roles.
 - **Multi-Factor Authentication (MFA)**: Enhance security for administrative access.
 
 
-### **9. Backup & Disaster Recovery**
+### 1.3.9. **Backup & Disaster Recovery**
 - **Scheduled Data Backup**: Ensure regular snapshots and database dumps.
 - **Disaster Recovery Plan**: Implement recovery strategies for minimal downtime.
 - **Automatic Failover**: Redirect services to backup servers when failures occur.
 
 
-### **10. API Gateway & Microservices Support**
+### 1.3.10. **10. API Gateway & Microservices Support**
 - **API Rate Limiting**: Control how frequently APIs can be accessed.
 - **Request Routing**: Direct API requests to correct backend services.
 - **Authentication & Security**: Implement **JWT-based authentication** for APIs.
 
 
-## Non-functional Requirements
+## 1.4. Non-functional Requirements
 
 **Table of design non-functional criteria**
 
@@ -120,108 +167,107 @@ This documentation outlines the design and implementation of a **web server with
 | **Interoperability**  | Compatibility with other systems | API standards, protocol support | RESTful APIs, DNS integration |
 | **Energy Efficiency** | Resource optimization | Power consumption, CPU efficiency | Green computing practices |
 
-## System Design
+## 1.5. System Design
 
-### Top Level Design
+### 1.5.1. Top Level Design
 
 The system consists of an **Nginx web server with reverse proxy**, a **Bind9 DNS server**, **SSL/TLS encryption**, and **Prometheus monitoring** for observability.
 
 ![alt text](_design/high-level-web-server.drawio.png)
 
-### Current provided hardware, software, and others:
+### 1.5.2. Current provided hardware, software, and others:
 
 - **Hardware**: On-premise servers
 - **Software**: Linux, Docker
 - **Networking**: Load balancers, firewalls, DNS configurations
 
-### Design for Objectives
+### 1.5.3. Design for Objectives
 
 1. **Web Server with Proxy (Nginx)**:
     - **Technology used**: Nginx, Docker
     - **Rationale**: High-performance, scalable, and secure proxy server
     - **Estimate time**: 2 weeks
 
-2. **DNS Server (Bind9)**:
-    - **Technology used**: Bind9, Linux
-    - **Rationale**: Reliable domain resolution for internal/external services
-    - **Estimate time**: 1 week
+**DNS Server (Bind9)**:
 
-3. **SSL/TLS Certification**:
+![alt text](implementing/dns-server/_documentation/dns-flow-design.drawio.png)
+
+1. **SSL/TLS Certification**:
     - **Technology used**: Let's Encrypt, OpenSSL
     - **Rationale**: Secure communication and data encryption
     - **Estimate time**: 3 days
 
-4. **Prometheus Monitoring for Nginx**:
+2. **Prometheus Monitoring for Nginx**:
     - **Technology used**: Prometheus, Grafana
     - **Rationale**: Observability and performance tracking based on SRE principles
     - **Estimate time**: 2 weeks
 
 
-## Prerequisites for On-Premise Web Server Deployment
+## 1.6. Prerequisites for On-Premise Web Server Deployment
 
-### **1. Hardware Requirements**
+### 1.6.1. **Hardware Requirements**
 - **Server Machines**: Bare-metal or virtualized servers for hosting web services.
 - **Storage**: SSD/NVMe recommended for fast read/write operations.
 - **Network Equipment**: Routers, switches, and firewalls for connectivity and security.
 - **Power Backup**: UPS or redundant power supply to avoid downtime.
 
 
-### **2. Operating System & Infrastructure**
+### 1.6.2. **Operating System & Infrastructure**
 - **Linux Distribution**: Ubuntu, Debian, CentOS, or Rocky Linux.
 - **Containerization (Optional)**: Docker or Kubernetes for microservices.
 - **Virtualization Support**: VMware, KVM, or VirtualBox if using VMs.
 
 
-### **3. Web Server & Proxy Setup**
+### 1.6.3. **Web Server & Proxy Setup**
 - **Nginx Installation**: Web server and reverse proxy role.
 - **Domain Configuration**: Ensure domain/subdomain registration for hosting.
 - **Reverse Proxy Rules**: Define backend request forwarding setup.
 
 
-### **4. DNS Server Setup (Bind9)**
+### 1.6.4. **DNS Server Setup (Bind9)**
 - **Bind9 Installation**: Install and configure DNS server.
 - **Zone Files**: Define authoritative DNS records.
 - **DNSSEC Implementation**: Enhance security for DNS queries.
 
 
-### **5. Security & SSL/TLS**
+### 1.6.5. **Security & SSL/TLS**
 - **SSL Certificates**: Generate using Let's Encrypt or enterprise CA.
 - **Firewall Rules**: Configure iptables or UFW for access control.
 - **Fail2Ban & IDS**: Implement security hardening and intrusion detection.
 
 
-### **6. Monitoring & Logging**
+### 1.6.6. **Monitoring & Logging**
 - **Prometheus Installation**: Set up metrics collection for observability.
 - **Grafana Dashboard**: Configure visual monitoring interface.
 - **ELK Stack Deployment**: Elasticsearch, Logstash, and Kibana for logging.
 
 
-### **7. Database Setup (If Required)**
+### 1.6.7. **Database Setup (If Required)**
 - **Database Server**: MySQL, PostgreSQL, MariaDB, or MongoDB.
 - **Replication & Backup**: Configure data redundancy and periodic snapshots.
 - **Query Optimization**: Indexing and caching for performance tuning.
 
 
-### **8. Network Configuration**
+### 1.6.8. **Network Configuration**
 - **Static IP & NAT Setup**: Assign fixed IP addresses to servers.
 - **Load Balancer (Optional)**: Use HAProxy or Nginx for balanced traffic distribution.
 - **Internal & External DNS Records**: Ensure hostname resolution is properly mapped.
 
 
-### **9. Authentication & Access Control**
+### 1.6.9. **Authentication & Access Control**
 - **User Management**: Implement **RBAC** and **LDAP** authentication.
 - **API Security**: Use JWT-based authorization for web applications.
 - **Multi-Factor Authentication (MFA)**: Enforce strong authentication policies.
 
 
-### **10. Backup & Disaster Recovery**
+### 1.6.10. **Backup & Disaster Recovery**
 - **Snapshot & Data Backup**: Schedule regular backups of system configurations.
 - **Failover Configuration**: Implement automatic failover mechanisms.
 - **Disaster Recovery Plan**: Define procedures for critical incident handling.
 
 
-## Implementation
-### Web Server Core Functionality
+## 1.7. Implementation
+### 1.7.1. Web Server Core Functionality
 
 **Description**:
 A web server that efficiently serves static and dynamic content, supports **reverse proxy**, **load balancing**, and ensures optimal session management.
@@ -242,19 +288,29 @@ A web server that efficiently serves static and dynamic content, supports **reve
 - Ensured **fast and optimized content delivery**.
 
 
-### DNS Server (Bind9)
+### 1.7.2. DNS Server (Bind9)
 
 **Description**:
 A **DNS server** that resolves domain names to IP addresses efficiently, ensuring caching, security, and zone management.
 
 **Implementing**:
-- Install **Bind9** DNS server on Linux.
-- Configure **zone files** for domain resolution.
+- Install **Bind9** DNS server on Docker container (IP address: `192.168.3.11`)
+  - Implemented in `implementing/docker-compose.yaml`
+  - Detail container is found in `implementing/dns-server/`
+  
+- Configure **zone files** for domain resolution:
+  - Implemented in  `implementing/dns-server/db.backend.com` for backend domain
+  - Implemented in  `implementing/dns-server/db..internal-infra.com` for other devops infra domain
+
 - Enable **DNS caching** for fast responses.
+
 - Implement **DNSSEC** for security.
 
 **Validating**:
 - Test domain resolution with `nslookup` and `dig`.
+
+![alt text](_design/nslookup-test-result.png)
+
 - Verify caching mechanism and query response times.
 - Ensure proper failover with secondary DNS.
 
@@ -263,7 +319,7 @@ A **DNS server** that resolves domain names to IP addresses efficiently, ensurin
 - Improved **query performance** and **network efficiency**.
 
 
-### Proxy Server (Nginx)
+### 1.7.3. Proxy Server (Nginx)
 
 **Description**:
 The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termination**, and **traffic control**.
@@ -283,7 +339,7 @@ The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termi
 - Enabled **high-performance traffic distribution**.
 
 
-### Security & SSL/TLS
+### 1.7.4. Security & SSL/TLS
 
 **Description**:
 Secure communication via **SSL/TLS**, preventing data interception and unauthorized access.
@@ -303,7 +359,7 @@ Secure communication via **SSL/TLS**, preventing data interception and unauthori
 - Improved security posture and **data protection**.
 
 
-### Monitoring & Logging (Prometheus, ELK Stack)
+### 1.7.5. Monitoring & Logging (Prometheus, ELK Stack)
 
 **Description**:
 System monitoring using **Prometheus** for metrics collection and **ELK Stack** for centralized logging.
@@ -323,7 +379,7 @@ System monitoring using **Prometheus** for metrics collection and **ELK Stack** 
 - Improved **system health visibility**.
 
 
-### Performance Optimization
+### 1.7.6. Performance Optimization
 
 **Description**:
 Optimizing system performance through **caching, load balancing, and CDN integration**.
@@ -342,7 +398,7 @@ Optimizing system performance through **caching, load balancing, and CDN integra
 - Performance enhancements led to **faster response times** and **efficient resource utilization**.
 
 
-### Fault Tolerance & High Availability
+### 1.7.7. Fault Tolerance & High Availability
 
 **Description**:
 Ensuring system reliability through **redundancy, failover, and automatic recovery mechanisms**.
@@ -361,7 +417,7 @@ Ensuring system reliability through **redundancy, failover, and automatic recove
 - Achieved **high availability and fault tolerance** with minimal downtime.
 
 
-### User Authentication & Access Control
+### 1.7.8. User Authentication & Access Control
 
 **Description**:
 Enforcing **secure access control mechanisms** using authentication and role-based permissions.
@@ -380,7 +436,7 @@ Enforcing **secure access control mechanisms** using authentication and role-bas
 - **Secure and controlled access** implemented successfully.
 
 
-### Backup & Disaster Recovery
+### 1.7.9. Backup & Disaster Recovery
 
 **Description**:
 Ensuring **data resilience** through scheduled backups and automatic failover mechanisms.
@@ -399,7 +455,7 @@ Ensuring **data resilience** through scheduled backups and automatic failover me
 - **Reliable backup strategies and disaster recovery** in place.
 
 
-### API Gateway & Microservices Support
+### 1.7.10. API Gateway & Microservices Support
 
 **Description**:
 Providing **API routing, security, and rate-limiting mechanisms** for microservices communication.
@@ -419,7 +475,7 @@ Providing **API routing, security, and rate-limiting mechanisms** for microservi
 
 
 
-## References
+## 1.8. References
 
 * [BIND9 Configuration Guide](https://wiki.debian.org/Bind9)
 * [NGINX Docs - Server Blocks](https://nginx.org/en/docs/http/server_names.html)

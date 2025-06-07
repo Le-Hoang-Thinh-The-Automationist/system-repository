@@ -1,0 +1,25 @@
+options {
+    directory "/var/cache/bind";
+
+    // Port 53 is the the default port of DNS
+    listen-on port 53 { any; };
+
+    // Allow queries from local network
+    allow-query { 
+        // localhost ip: 127.0.0.1 
+        localhost; 
+        192.168.3.0/24;
+    };
+
+    // Forward DNS queries to external resolvers
+    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+
+    // DNSSEC (DNS Security Extensions)
+    dnssec-validation auto;
+
+    // If the internal DNS query is not known, BIND will search for extenal DNS servers
+    recursion yes;
+};

@@ -1,0 +1,9 @@
+zone "backend.com" {
+    type master;
+    file "/etc/bind/db.backend.com";
+};
+
+zone "internal-infra.com" {
+    type master;
+    file "/etc/bind/db.internal-infra.com";
+};

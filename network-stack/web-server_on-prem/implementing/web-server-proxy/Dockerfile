@@ -2,7 +2,9 @@
 FROM nginx:latest
 
 # Copy custom Nginx configuration file to the container
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf     /etc/nginx/nginx.conf
+COPY nginx-conf/    /etc/nginx/nginx-conf/
+COPY ssl/           /etc/nginx/ssl/
 
 # Copy website files (optional)
 COPY html/ /usr/share/nginx/html/

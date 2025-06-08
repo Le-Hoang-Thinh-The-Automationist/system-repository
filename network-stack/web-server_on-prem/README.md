@@ -21,7 +21,6 @@
   - [1.5. System Design](#15-system-design)
     - [1.5.1. Top Level Design](#151-top-level-design)
     - [1.5.2. Current provided hardware, software, and others:](#152-current-provided-hardware-software-and-others)
-    - [1.5.3. Design for Objectives](#153-design-for-objectives)
   - [1.6. Prerequisites for On-Premise Web Server Deployment](#16-prerequisites-for-on-premise-web-server-deployment)
     - [1.6.1. **Hardware Requirements**](#161-hardware-requirements)
     - [1.6.2. **Operating System \& Infrastructure**](#162-operating-system--infrastructure)
@@ -181,28 +180,6 @@ The system consists of an **Nginx web server with reverse proxy**, a **Bind9 DNS
 - **Software**: Linux, Docker
 - **Networking**: Load balancers, firewalls, DNS configurations
 
-### 1.5.3. Design for Objectives
-
-1. **Web Server with Proxy (Nginx)**:
-    - **Technology used**: Nginx, Docker
-    - **Rationale**: High-performance, scalable, and secure proxy server
-    - **Estimate time**: 2 weeks
-
-**DNS Server (Bind9)**:
-
-![alt text](implementing/dns-server/_documentation/dns-flow-design.drawio.png)
-
-1. **SSL/TLS Certification**:
-    - **Technology used**: Let's Encrypt, OpenSSL
-    - **Rationale**: Secure communication and data encryption
-    - **Estimate time**: 3 days
-
-2. **Prometheus Monitoring for Nginx**:
-    - **Technology used**: Prometheus, Grafana
-    - **Rationale**: Observability and performance tracking based on SRE principles
-    - **Estimate time**: 2 weeks
-
-
 ## 1.6. Prerequisites for On-Premise Web Server Deployment
 
 ### 1.6.1. **Hardware Requirements**
@@ -299,6 +276,11 @@ A web server that efficiently serves static and dynamic content, supports **reve
 **Description**:
 A **DNS server** that resolves domain names to IP addresses efficiently, ensuring caching, security, and zone management.
 
+**Design Diagram**
+
+![alt text](implementing/dns-server/_documentation/dns-flow-design.drawio.png)
+
+
 **Implementing**:
 - Install **Bind9** DNS server on Docker container (IP address: `192.168.3.11`)
   - Implemented in `implementing/docker-compose.yaml`
@@ -330,6 +312,11 @@ A **DNS server** that resolves domain names to IP addresses efficiently, ensurin
 **Description**:
 The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termination**, and **traffic control**.
 
+**Design Diagram**
+
+![alt text](implementing/web-server-proxy/_documentation/nginx-proxy.drawio.png)
+
+
 **Implementing**:
 - Configure **Nginx** for **reverse proxy** routing
   - The configuration for reverse proxy routing is implemented in `implementing/web-server-proxy/nginx.conf`
@@ -337,15 +324,19 @@ The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termi
   - The configuration for service-2 routing is implemented in `implementing/web-server-proxy/service-2.backend.com.conf`
 
 - Set up **SSL termination** to handle HTTPS requests.
+  - The SSL cert for the domain `*.backend.com` is implemented in `implementing/web-server-proxy/nginx-conf/ssl/ssl-backend.com.conf`
+
 - Apply **rate limiting and request filtering**.
 
 **Validating**:
 - Verify **proxy functionality** with test requests.
 
-![alt text](image.png)
-
+![alt text](testing/_result/reverse-proxy-test-result.png)
 
 - Ensure SSL/TLS encryption is properly configured using `openssl s_client`.
+
+![alt text](testing/_result/ssl-cert-enable.png)
+
 - Monitor **traffic handling and load balancing performance**.
 
 **Result**:

@@ -10,7 +10,9 @@ services:
     networks:
       internal-net:
         ipv4_address: 192.168.3.20  
-
+    dns:
+      - 192.168.3.11  
+      
   service-2:
     build:
       context: ./backend-service
@@ -20,7 +22,9 @@ services:
     networks:
       internal-net:
         ipv4_address: 192.168.3.21
-
+    dns:
+      - 192.168.3.11  
+      
   web-server-proxy:
     build:
       context: ./web-server-proxy
@@ -33,6 +37,8 @@ services:
     networks:
       internal-net:
         ipv4_address: 192.168.3.10
+    dns:
+      - 192.168.3.11  
 
   dns-server:
     build:
@@ -46,12 +52,11 @@ services:
     networks:
       internal-net:
         ipv4_address: 192.168.3.11
+
+
 networks:
   internal-net:
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.3.0/24
-    # Set the DNS server for all services
-    dns:
-    - 192.168.3.11  

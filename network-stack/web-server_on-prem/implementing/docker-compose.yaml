@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  service-1:
+    build:
+      context: ./backend-service
+      dockerfile: Dockerfile
+    ports:
+      - "10300:3000"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.20  
+
+  service-2:
+    build:
+      context: ./backend-service
+      dockerfile: Dockerfile
+    ports:
+      - "10301:3000"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.21
+
   web-server-proxy:
     build:
       context: ./web-server-proxy
@@ -32,3 +52,6 @@ networks:
     ipam:
       config:
         - subnet: 192.168.3.0/24
+    # Set the DNS server for all services
+    dns:
+    - 192.168.3.11  

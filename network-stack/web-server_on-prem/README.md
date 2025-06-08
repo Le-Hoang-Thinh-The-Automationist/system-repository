@@ -34,17 +34,17 @@
     - [1.6.9. **Authentication \& Access Control**](#169-authentication--access-control)
     - [1.6.10. **Backup \& Disaster Recovery**](#1610-backup--disaster-recovery)
   - [1.7. Implementation](#17-implementation)
-    - [1.7.1. Web Server Core Functionality](#171-web-server-core-functionality)
-    - [1.7.2. DNS Server (Bind9)](#172-dns-server-bind9)
-    - [1.7.3. Proxy Server (Nginx)](#173-proxy-server-nginx)
-    - [1.7.4. Security \& SSL/TLS](#174-security--ssltls)
-    - [1.7.5. Monitoring \& Logging (Prometheus, ELK Stack)](#175-monitoring--logging-prometheus-elk-stack)
-    - [1.7.6. Performance Optimization](#176-performance-optimization)
-    - [1.7.7. Fault Tolerance \& High Availability](#177-fault-tolerance--high-availability)
-    - [1.7.8. User Authentication \& Access Control](#178-user-authentication--access-control)
-    - [1.7.9. Backup \& Disaster Recovery](#179-backup--disaster-recovery)
-    - [1.7.10. API Gateway \& Microservices Support](#1710-api-gateway--microservices-support)
-  - [1.8. References](#18-references)
+    - [1.7.1. **Web Server Core Functionality**](#171-web-server-core-functionality)
+    - [1.7.2. **DNS Server (Bind9)**](#172-dns-server-bind9)
+    - [1.7.3. **Proxy Server (Nginx)**](#173-proxy-server-nginx)
+    - [1.7.4. **Security \& SSL/TLS**](#174-security--ssltls)
+    - [1.7.5. **Monitoring \& Logging (Prometheus, ELK Stack)**](#175-monitoring--logging-prometheus-elk-stack)
+    - [1.7.6. **Performance Optimization**](#176-performance-optimization)
+    - [1.7.7. **Fault Tolerance \& High Availability**](#177-fault-tolerance--high-availability)
+    - [1.7.8. **User Authentication \& Access Control**](#178-user-authentication--access-control)
+    - [1.7.9. **Backup \& Disaster Recovery**](#179-backup--disaster-recovery)
+    - [1.7.10. **API Gateway \& Microservices Support**](#1710-api-gateway--microservices-support)
+  - [1.8. **References**](#18-references)
 
 
 ## 1.1. Version History
@@ -267,14 +267,20 @@ The system consists of an **Nginx web server with reverse proxy**, a **Bind9 DNS
 
 
 ## 1.7. Implementation
-### 1.7.1. Web Server Core Functionality
+### 1.7.1. **Web Server Core Functionality**
 
 **Description**:
 A web server that efficiently serves static and dynamic content, supports **reverse proxy**, **load balancing**, and ensures optimal session management.
 
 **Implementing**:
-- Install **Nginx** as the web server.
+- Install **Nginx** as the web server on Docker container (IP address: `192.168.3.10`)
+  - Implemented in `implementing/docker-compose.yaml`
+  - Detail container is found in `implementing/web-server-proxy/`
+   
 - Configure **reverse proxy** settings for backend services.
+  - Create two dummy backend container with the dockerfile in `implementing/backend-service`
+  - Create two `service-1.backend.com.conf` and `service-2.backend.com.conf` in `implementing/web-server-proxy/` as reverse proxy for two backend services
+
 - Implement **load balancing** with round-robin and least-connections strategies.
 - Enable **Gzip compression** for optimized content delivery.
 
@@ -288,7 +294,7 @@ A web server that efficiently serves static and dynamic content, supports **reve
 - Ensured **fast and optimized content delivery**.
 
 
-### 1.7.2. DNS Server (Bind9)
+### 1.7.2. **DNS Server (Bind9)**
 
 **Description**:
 A **DNS server** that resolves domain names to IP addresses efficiently, ensuring caching, security, and zone management.
@@ -319,18 +325,26 @@ A **DNS server** that resolves domain names to IP addresses efficiently, ensurin
 - Improved **query performance** and **network efficiency**.
 
 
-### 1.7.3. Proxy Server (Nginx)
+### 1.7.3. **Proxy Server (Nginx)**
 
 **Description**:
 The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termination**, and **traffic control**.
 
 **Implementing**:
-- Configure **Nginx** for **reverse proxy** routing.
+- Configure **Nginx** for **reverse proxy** routing
+  - The configuration for reverse proxy routing is implemented in `implementing/web-server-proxy/nginx.conf`
+  - The configuration for service-1 routing is implemented in `implementing/web-server-proxy/service-1.backend.com.conf`
+  - The configuration for service-2 routing is implemented in `implementing/web-server-proxy/service-2.backend.com.conf`
+
 - Set up **SSL termination** to handle HTTPS requests.
 - Apply **rate limiting and request filtering**.
 
 **Validating**:
 - Verify **proxy functionality** with test requests.
+
+![alt text](image.png)
+
+
 - Ensure SSL/TLS encryption is properly configured using `openssl s_client`.
 - Monitor **traffic handling and load balancing performance**.
 
@@ -339,7 +353,7 @@ The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termi
 - Enabled **high-performance traffic distribution**.
 
 
-### 1.7.4. Security & SSL/TLS
+### 1.7.4. **Security & SSL/TLS**
 
 **Description**:
 Secure communication via **SSL/TLS**, preventing data interception and unauthorized access.
@@ -359,7 +373,7 @@ Secure communication via **SSL/TLS**, preventing data interception and unauthori
 - Improved security posture and **data protection**.
 
 
-### 1.7.5. Monitoring & Logging (Prometheus, ELK Stack)
+### 1.7.5. **Monitoring & Logging (Prometheus, ELK Stack)**
 
 **Description**:
 System monitoring using **Prometheus** for metrics collection and **ELK Stack** for centralized logging.
@@ -379,7 +393,7 @@ System monitoring using **Prometheus** for metrics collection and **ELK Stack** 
 - Improved **system health visibility**.
 
 
-### 1.7.6. Performance Optimization
+### 1.7.6. **Performance Optimization**
 
 **Description**:
 Optimizing system performance through **caching, load balancing, and CDN integration**.
@@ -398,7 +412,7 @@ Optimizing system performance through **caching, load balancing, and CDN integra
 - Performance enhancements led to **faster response times** and **efficient resource utilization**.
 
 
-### 1.7.7. Fault Tolerance & High Availability
+### 1.7.7. **Fault Tolerance & High Availability**
 
 **Description**:
 Ensuring system reliability through **redundancy, failover, and automatic recovery mechanisms**.
@@ -417,7 +431,7 @@ Ensuring system reliability through **redundancy, failover, and automatic recove
 - Achieved **high availability and fault tolerance** with minimal downtime.
 
 
-### 1.7.8. User Authentication & Access Control
+### 1.7.8. **User Authentication & Access Control**
 
 **Description**:
 Enforcing **secure access control mechanisms** using authentication and role-based permissions.
@@ -436,7 +450,7 @@ Enforcing **secure access control mechanisms** using authentication and role-bas
 - **Secure and controlled access** implemented successfully.
 
 
-### 1.7.9. Backup & Disaster Recovery
+### 1.7.9. **Backup & Disaster Recovery**
 
 **Description**:
 Ensuring **data resilience** through scheduled backups and automatic failover mechanisms.
@@ -455,7 +469,7 @@ Ensuring **data resilience** through scheduled backups and automatic failover me
 - **Reliable backup strategies and disaster recovery** in place.
 
 
-### 1.7.10. API Gateway & Microservices Support
+### 1.7.10. **API Gateway & Microservices Support**
 
 **Description**:
 Providing **API routing, security, and rate-limiting mechanisms** for microservices communication.
@@ -475,7 +489,7 @@ Providing **API routing, security, and rate-limiting mechanisms** for microservi
 
 
 
-## 1.8. References
+## 1.8. **References**
 
 * [BIND9 Configuration Guide](https://wiki.debian.org/Bind9)
 * [NGINX Docs - Server Blocks](https://nginx.org/en/docs/http/server_names.html)

@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s  # How often to scrape targets
+  evaluation_interval: 15s  # How often to evaluate rules
+
+scrape_configs:
+  - job_name: 'nginx_metrics_exporter'
+    static_configs:
+      # nginx-exporter is the dns of the nginx exporter, created by docker compose
+      - targets: ['nginx-exporter:9113']
+

@@ -1,30 +1,6 @@
 version: '3.8'
 
 services:
-  service-1:
-    build:
-      context: ./backend-service
-      dockerfile: Dockerfile
-    ports:
-      - "10300:3000"
-    networks:
-      internal-net:
-        ipv4_address: 192.168.3.20  
-    dns:
-      - 192.168.3.11  
-      
-  service-2:
-    build:
-      context: ./backend-service
-      dockerfile: Dockerfile
-    ports:
-      - "10301:3000"
-    networks:
-      internal-net:
-        ipv4_address: 192.168.3.21
-    dns:
-      - 192.168.3.11  
-      
   web-server-proxy:
     build:
       context: ./web-server-proxy
@@ -53,6 +29,74 @@ services:
       internal-net:
         ipv4_address: 192.168.3.11
 
+  service-1:
+    build:
+      context: ./backend-service
+      dockerfile: Dockerfile
+    ports:
+      - "10300:3000"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.20  
+    dns:
+      - 192.168.3.11  
+      
+  service-2:
+    build:
+      context: ./backend-service
+      dockerfile: Dockerfile
+    ports:
+      - "10301:3000"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.21
+    dns:
+      - 192.168.3.11  
+
+  metrics-server:
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    ports:
+      - "19090:9090"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.30
+
+  monitor-dashboard:
+    build:
+      context: ./monitoring/grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    depends_on:
+      - metrics-server
+    ports:
+      - "13000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.31
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.4.2
+    container_name: nginx-exporter
+    ports:
+      - "19113:9113"
+    depends_on:
+      - web-server-proxy
+    command:
+      - "--nginx.scrape-uri=http://web-server-proxy/stub_status"
+    networks:
+      internal-net:
+        ipv4_address: 192.168.3.33
+        
+volumes:
+  grafana-storage:
 
 networks:
   internal-net:

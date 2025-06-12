@@ -48,9 +48,12 @@
 
 ## 1.1. Version History
 
-| Version | Release Date | Changes & Updates | Author    |
-|---------|--------------|-------------------|-----------|
-| 0.0.1   | 07 June 2025 | Initial           | L.H.Thinh |
+| Version | Release Date | Changes & Updates                      | Author    |
+|---------|--------------|----------------------------------------|-----------|
+| v0.4.1  | 12 June 2025 | Bind9 & DNS config for `*.backend.com` | L.H.Thinh |
+|         |              | Nginx & reverse Proxy for services     |           |
+|         |              | TLS Certification & CA cert for HTTPS  |           |
+|         |              | Simple monitoring system               |           |
 
 ## 1.2. Overview
 
@@ -297,7 +300,7 @@ A **DNS server** that resolves domain names to IP addresses efficiently, ensurin
 **Validating**:
 - Test domain resolution with `nslookup` and `dig`.
 
-![alt text](_design/nslookup-test-result.png)
+![alt text](testing/_result/nslookup-test-result.png)
 
 - Verify caching mechanism and query response times.
 - Ensure proper failover with secondary DNS.
@@ -350,8 +353,13 @@ The proxy server manages **forward and reverse proxy requests**, **SSL/TLS termi
 Secure communication via **SSL/TLS**, preventing data interception and unauthorized access.
 
 **Implementing**:
-- Generate SSL certificates with **Let's Encrypt**.
+- Generate SSL certificates with OpenSSL.
+  - Generate SSL certificates with own `openssl` in the `implementing/ssl-certification/openssl.sh`
+  - `implementing/ssl-certification/ca.crt` and `implementing/ssl-certification/ca.key` is the product of openSSL (the CA cert and key stored in this are only example, no security risk to web)
+  
 - Configure **Nginx** to enforce HTTPS connections.
+  - Implemented in `implementing/web-server-proxy/nginx-conf/router.conf` as the HTTP request from client will always redirect to HTTPS.
+
 - Implement **HSTS and strong cipher suites**.
 
 **Validating**:
@@ -369,9 +377,20 @@ Secure communication via **SSL/TLS**, preventing data interception and unauthori
 **Description**:
 System monitoring using **Prometheus** for metrics collection and **ELK Stack** for centralized logging.
 
+**Design Diagram**
+
+![alt text](implementing/monitoring/__documentation/monitoring.drawio.png)
+
 **Implementing**:
 - Install **Prometheus** and configure **Nginx exporter**.
+  - Implemented **Prometheus** in `implementing/monitoring/prometheus`
+  - Implemented **Nginx exporter** in `implementing/docker-compose.yaml`  (The service: `nginx-exporter`)
+  - Add the `location /stub_status` in `implementing/web-server-proxy/nginx-conf/router.conf`
+
 - Set up **Grafana dashboards** for visualization.
+  - Implemented **Grafana** in `implementing/monitoring/grafana`
+  - Implemented **Grafana dashboards** in `implementing/monitoring/grafana/dashboards` and `implementing/monitoring/grafana/dashboards.yml`
+
 - Integrate **Elasticsearch, Logstash, Kibana (ELK)** for centralized logging.
 
 **Validating**:

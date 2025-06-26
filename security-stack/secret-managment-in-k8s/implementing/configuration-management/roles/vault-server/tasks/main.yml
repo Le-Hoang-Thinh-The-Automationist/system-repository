@@ -1,0 +1,12 @@
+---
+- name: Vault Server setup
+  include_tasks: "{{ role_path }}/tasks/{{ cluster }}_vault-server-setup.yml"
+
+- name: Authenticate with Vault
+  shell: "cat '{{ playbook_dir }}/temp/root_token.txt' | vault login -"
+
+- name: Create multiple project's Secrets & Policies in the Vault Server 
+  include_tasks: "{{ role_path }}/tasks/{{ cluster }}_secrets-and-policies.yml"
+
+# - name: Inject the Secret-ID to the Vault Agent
+#   include_tasks: "{{ role_path }}/tasks/{{ cluster }}_inject-secret-vault-agent.yml"

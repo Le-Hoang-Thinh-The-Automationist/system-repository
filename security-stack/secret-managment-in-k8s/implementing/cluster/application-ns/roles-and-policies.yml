@@ -1,0 +1,25 @@
+
+# Read and access to vault
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-access-vault
+  namespace: application-ns
+rules:
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    resourceNames: ["service-vault-server"]
+    verbs: ["get", "list", "watch"]
+
+---
+# Read and access to mysql
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-access-mysql
+  namespace: application-ns
+rules:
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    resourceNames: ["mysql-internal"]
+    verbs: ["get", "list", "watch"]

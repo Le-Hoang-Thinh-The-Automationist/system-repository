@@ -1,0 +1,82 @@
+---
+# NETWORKING RELATED
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-vault-server
+  namespace: application-ns
+  labels:
+    app: statefulset-vault
+spec:
+  # DNS for the service is service-vault-server.application-ns.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: statefulset-vault
+  ports:
+    - name: vault-port
+      port: 8200
+      targetPort: 8200
+
+---
+# WORKLOAD RELATED
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-vault
+  namespace: application-ns
+  labels:
+    app: statefulset-vault
+spec:
+  # DNS for the service is statefulset-vault-<number>.service-vault-server.application-ns.svc.cluster.local
+  serviceName: "service-vault-server"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statefulset-vault
+  template:
+    metadata:
+      labels:
+        app: statefulset-vault
+    spec:
+      containers:
+        - name: vault-container
+          image: vault-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8200
+              name: vault-port
+          env:
+            - name: VAULT_ADDR
+              value: "http://0.0.0.0:8200"
+            - name: VAULT_API_ADDR
+              value: "http://0.0.0.0:8200"
+            - name: VAULT_LOG_LEVEL
+              value: "info"
+          command:
+            - vault
+            - server
+            - "-config=/vault/config/vault.hcl"
+          volumeMounts:
+            # Only the volume with the Vault Data should be store in PV
+            - name: vault-data
+              mountPath: /vault/data
+          securityContext:
+            capabilities:
+              add: ["ALL"]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "20m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+      volumes:
+        - name: vault-config
+  volumeClaimTemplates:
+    - metadata:
+        name: vault-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

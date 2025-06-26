@@ -1,0 +1,74 @@
+--- 
+# NETWORKING RELATED
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-internal
+  namespace: application-ns
+  labels:
+    app: statefulset-mysql
+spec:
+  # DNS for the service is mysql-internal.application-ns.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: statefulset-mysql
+  ports:
+    - name: mysql-port
+      port: 3306
+      targetPort: 3306
+
+---
+# WORKLOAD RELATED
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-mysql
+  namespace: application-ns
+  labels:
+    app: statefulset-mysql
+spec:
+  # DNS for the service is statefulset-mysql-<number>.mysql-internal.application-ns.svc.cluster.local
+  serviceName: "mysql-internal"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statefulset-mysql
+  template:
+    metadata:
+      labels:
+        app: statefulset-mysql
+    spec:
+      containers:
+        - name: container-mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mysql-port
+              containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
+            - name: MYSQL_DATABASE
+              value: "testdb"
+            - name: MYSQL_USER
+              value: "user"
+            - name: MYSQL_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

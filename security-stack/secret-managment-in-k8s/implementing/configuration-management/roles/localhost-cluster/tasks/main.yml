@@ -1,0 +1,7 @@
+---
+- name: Start Docker Compose for local testing
+  community.docker.docker_compose_v2:
+    project_src: "{{ role_path }}/local-project"
+    state: present
+    build: always
+  

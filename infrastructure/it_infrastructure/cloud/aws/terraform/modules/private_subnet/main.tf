@@ -29,7 +29,8 @@ resource "aws_route_table_association" "private_assoc" {
 # NAT Gateway integration
 resource "aws_eip" "nat" {
   count = var.enable_nat ? (var.single_nat ? 1 : length(var.azs)) : 0
-  vpc   = true
+  domain      = "vpc"
+
 
   tags = merge(
     { Name = "${var.name}-eip-${count.index}" },

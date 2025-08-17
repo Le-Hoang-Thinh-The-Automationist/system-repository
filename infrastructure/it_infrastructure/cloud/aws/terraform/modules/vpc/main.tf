@@ -14,7 +14,7 @@ resource "aws_flow_log" "this" {
   count           = var.enable_flow_logs ? 1 : 0
   vpc_id          = aws_vpc.this.id
   traffic_type    = "ALL"
-  log_destination = aws_cloudwatch_log_group.vpc_flow.arn
+  log_destination = aws_cloudwatch_log_group.vpc_flow[count.index].arn
 
   depends_on = [aws_cloudwatch_log_group.vpc_flow]
 }

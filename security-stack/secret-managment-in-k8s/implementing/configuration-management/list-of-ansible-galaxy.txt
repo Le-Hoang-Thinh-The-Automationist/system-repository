@@ -1,0 +1,2 @@
+community.hashi_vault
+community.docker

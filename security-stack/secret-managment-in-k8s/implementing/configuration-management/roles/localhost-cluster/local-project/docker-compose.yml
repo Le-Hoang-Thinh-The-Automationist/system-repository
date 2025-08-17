@@ -1,0 +1,70 @@
+# If the docker compose used is version `3.9`, then the line below will be obsolete
+# version: '3.8'
+
+services:
+  backend:
+    build:
+      # The path looks really bad rn but this is temporary, I promised!
+      context: ../../../../backend-service/application-container
+      dockerfile: Dockerfile
+    container_name: backend-app
+    depends_on:
+      - vault-agent
+    ports:
+      - "5000:5000"
+    volumes:
+      # Read the .env from the /vault/output for the access to database from Vault Agent
+      - "secret_injection_volume:/vault/output:ro"
+
+  vault-agent:
+    build:
+      # The path looks really bad rn but this is temporary, I promised!
+      context: ../../../../backend-service/vault-injection-agent
+      dockerfile: Dockerfile
+    container_name: vault-agent
+    tty: true
+    depends_on:
+      - vault
+    cap_add:
+      - ALL
+    volumes:
+      # Write the .env from the /vault/output for the access to database for the Application
+      - "secret_injection_volume:/vault/output"
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  vault:
+    build:
+      # The path looks really bad rn but this is temporary, I promised!
+      context: ../../../../secret-management
+      dockerfile: Dockerfile
+    container_name: vault-server
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+      VAULT_LOG_LEVEL: "info"
+    cap_add:
+      - ALL
+    volumes:
+      # 
+      - "vault:/vault/data"
+    command: vault server -config=/vault/config/vault.hcl
+    tty: true
+
+volumes:
+  vault: 
+  mysql_data:
+  secret_injection_volume:

@@ -1,0 +1,9 @@
+---
+- name: Initial Setup for the Minikube Cluster
+  include_tasks: "{{ role_path }}/tasks/initial_setup.yml"
+
+- name: Build Docker Images for deployment to Cluster
+  include_tasks: "{{ role_path }}/tasks/build_image_tasks.yml"
+
+- name: Deploy all K8s Resources to Cluster
+  include_tasks: "{{ role_path }}/tasks/deploy_k8s_resources.yml"

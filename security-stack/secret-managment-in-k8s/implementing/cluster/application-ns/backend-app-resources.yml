@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-backend
+  namespace: application-ns
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rb-sa-backend-vault-access
+  namespace: application-ns
+subjects:
+  - kind: ServiceAccount
+    name: sa-backend
+    namespace: application-ns
+roleRef:
+  kind: Role
+  name: role-access-vault
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# NETWORKING RELATED
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-backend
+  namespace: application-ns
+  labels:
+    app: service-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: deployment-backend
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+
+---
+# WORKLOAD RELATED
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-backend
+  namespace: application-ns
+  labels:
+    app: deployment-backend
+spec:
+  replicas: 1
+  serviceAccountName: sa-backend
+  selector:
+    matchLabels:
+      app: deployment-backend
+  template:
+    metadata:
+      labels:
+        app: deployment-backend
+    spec:
+      containers:
+        # Main Backend Application
+        - name: backend-app-container
+          image: backend-app-image:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: secret-injection-volume
+              mountPath: /vault/output
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+        # Vault Injetion Agent Sidecar 
+        - name: vault-agent-container
+          image: vault-agent-image:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: secret-injection-volume
+              mountPath: /vault/output
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "32Mi"
+              cpu: "50m"
+      volumes:
+        # Volume shared by both the Vault Agent and the Backend app
+        - name: secret-injection-volume
+          emptyDir: {}

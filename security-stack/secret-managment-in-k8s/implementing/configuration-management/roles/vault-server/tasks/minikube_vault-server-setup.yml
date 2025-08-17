@@ -1,0 +1,54 @@
+---
+- name: Install Vault Package
+  apt:
+    name: vault
+    state: present
+
+- name: Check Vault Status
+  command: "vault status"
+  register: vault_status
+  ignore_errors: yes 
+
+- name: Initialize Vault if not already initialized
+  # If in the Vault status found that the Initialization is false, then proceed to extract the key below
+  when: vault_status.stdout is search("Initialized\\s+false")
+  
+  block:
+    - name: Initialize Vault
+      command: vault operator init -key-shares=5 -key-threshold=3
+      register: vault_init
+
+    - name: Save Unseal Keys & Root Token
+      copy:
+        content: "{{ vault_init.stdout }}"
+        dest: "{{ playbook_dir }}/temp/vault_init_keys.txt"
+        mode: "0600"
+
+    - name: Extract unseal keys and root tokens to txt files
+      command: "python3 {{ role_path }}/files/extract-keys-and-token.py {{ playbook_dir }}/temp/vault_init_keys.txt {{ playbook_dir }}/temp"
+      register: extract_key
+
+    - name: Display Initialization Output
+      debug:
+        msg: "{{ extract_key.stdout }} \n {{ vault_init.stdout }}"
+
+- name: Unsealing Vault
+  when: vault_status.stdout is search('Sealed\\s+true')
+  block:
+    - name: Set the number of unseal key to read to 3
+      set_fact:
+        unseal_key_files: "{{ range(1, 4) | list }}"
+
+    - name: Read unseal keys
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/temp/unseal_key_{{ item }}.txt"
+      loop: "{{ unseal_key_files }}"
+      loop_control:
+        index_var: index_key
+      register: raw_keys
+
+    - name: Unseal Vault
+      command: "vault operator unseal {{ item.content | b64decode | trim }}"
+      loop: "{{ raw_keys.results }}"
+      loop_control:
+        index_var: index_key

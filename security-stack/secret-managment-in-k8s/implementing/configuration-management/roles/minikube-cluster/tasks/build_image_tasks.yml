@@ -1,0 +1,56 @@
+---
+- name: Build Docker images for the deployment 
+  vars:
+    - build_path: "{{ playbook_dir }}/.."
+
+  block:
+    # Backend Service Pod's containers
+    - name: Image for Backend Application
+      ansible.builtin.command: 
+        cmd: "docker build -t backend-app-image:latest -f '{{ build_path }}/backend-service/application-container/Dockerfile' '{{ build_path }}/backend-service/application-container'"
+
+    - name: Image for Vault Injection Agent
+      ansible.builtin.command: 
+        cmd: "docker build -t vault-agent-image:latest -f '{{ build_path }}/backend-service/vault-injection-agent/Dockerfile' '{{ build_path }}/backend-service/vault-injection-agent'"
+
+    # Vault Server Pod's containers
+    - name: Image for Vault Server
+      ansible.builtin.command: 
+        cmd: "docker build -t vault-server:latest -f '{{ build_path }}/secret-management/Dockerfile' '{{ build_path }}/secret-management'"
+
+- name: Copy Docker Image to Minikube docker
+  vars:
+    - minikube_host:  docker
+    - minikube_ip:    192.168.49.2
+    - minikube_ssh:   "~/.minikube/machines/minikube/id_rsa"
+    - docker_images:
+        - backend-app-image
+        - vault-agent-image
+        - vault-server
+  block:
+    - name: Remove any previous .tar package files before packaging the current docker image
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/{{ item }}.tar"
+        state: absent
+      loop: "{{ docker_images }}"
+
+    - name: Packaging the docker images to .tar file
+      ansible.builtin.command: 
+        cmd: "docker save -o {{ item }}.tar {{ item }}:latest"
+      loop: "{{ docker_images }}"
+    
+    - name: Copying the docker images .tar file from local to minikube
+      ansible.builtin.command: 
+        cmd: "scp -i {{ minikube_ssh }} {{ item }}.tar {{ minikube_host }}@{{ minikube_ip }}:/home/docker"
+      loop: "{{ docker_images }}"
+
+    - name: Remove the .tar package files after delivered
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/{{ item }}.tar"
+        state: absent
+      loop: "{{ docker_images }}"
+    
+    - name: Load the .tar package to ready-to-run Docker image on minikube 
+      ansible.builtin.command: 
+        cmd: "ssh -i {{ minikube_ssh }} {{ minikube_host }}@{{ minikube_ip }} 'docker load -i /home/docker/{{ item }}.tar'"
+      loop: "{{ docker_images }}"

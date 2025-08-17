@@ -1,0 +1,20 @@
+---
+# Initialize the Vault
+- name: Save Unseal Keys & Root Token
+  copy:
+    content: "{{ vault_init.stdout }}"
+    dest: "{{ playbook_dir }}/temp/vault_init_keys.txt"
+    mode: "0600"
+  notify: 
+    - Extract unseal keys and root tokens to txt files
+    - Display Initialization Output
+
+- name: Extract unseal keys and root tokens to txt files
+  command: "python3 {{ role_path }}/files/extract-keys-and-token.py {{ playbook_dir }}/temp/vault_init_keys.txt {{ playbook_dir }}/temp"
+  register: extract_key
+
+- name: Display Initialization Output
+  debug:
+    msg: "{{ extract_key.stdout }} \n {{ vault_init.stdout }}"
+
+

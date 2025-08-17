@@ -1,0 +1,6 @@
+---
+- name: Start Minikube
+  command: minikube start
+
+- name: Add the Nginx Ingress Controller to the Minikube 
+  command: minikube addons enable ingress

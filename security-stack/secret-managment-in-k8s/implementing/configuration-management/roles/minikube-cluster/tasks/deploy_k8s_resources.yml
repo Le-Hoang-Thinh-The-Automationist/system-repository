@@ -1,0 +1,31 @@
+---
+- name: Deploy all Kubernetes resources from YAML files to 'application-ns'
+  vars:
+    - build_path: "{{ playbook_dir }}/.."
+
+  block:
+    - name: Create Application Namespace in the cluster
+      k8s:
+        state: present
+        src: "{{ build_path }}/cluster/application-ns/_base-resources.yml"
+
+    - name: Gather Kubernetes resource files in the 'application-ns' directory
+      find:
+        paths: "{{ build_path }}/cluster/application-ns"
+        patterns: "*.yml"
+      register: found_k8s_files
+
+    - name: Debug 
+      debug:
+        msg: "{{ found_k8s_files.files }}"
+        
+    - name: Deploy Kubernetes resource files
+      k8s:
+        state: present
+        src: "{{ item.path }}"
+      loop: "{{ found_k8s_files.files }}"
+
+
+- name: Wait for 5 seconds for the Application to stabilize
+  ansible.builtin.pause:
+    seconds: 5

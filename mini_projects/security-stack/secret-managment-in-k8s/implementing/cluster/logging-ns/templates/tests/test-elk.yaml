@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "test-elk-stack"
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app.kubernetes.io/name: {{ include "logging-ns.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: test
+    helm.sh/hook: test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: elk-test
+      image: curlimages/curl:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - >
+          echo "Testing Elasticsearch..." &&
+          curl -s http://elasticsearch:9200/_cluster/health?pretty | grep -q '"status"' &&
+          echo "Testing Logstash port..." &&
+          nc -zv logstash 5044 &&
+          echo "Testing Kibana HTTP..." &&
+          curl -s -o /dev/null -w "%{http_code}" http://kibana:5601 | grep -q "200" &&
+          echo "All ELK components are working."

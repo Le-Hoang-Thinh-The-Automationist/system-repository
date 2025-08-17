@@ -1,0 +1,32 @@
+ELK Stack has been deployed!
+
+Components:
+- Elasticsearch: Running at http://elasticsearch:9200
+- Logstash: Accepting input on port 5044
+- Kibana: Web UI available at http://<your-node-ip>:<node-port> (NodePort) or via port-forward
+
+To access Kibana locally:
+
+  kubectl port-forward svc/kibana 5601:5601
+
+Then open your browser at:
+
+  http://localhost:5601
+
+Initial Index Setup:
+
+1. Go to "Stack Management" > "Index Patterns"
+2. Create an index pattern with: filebeat-*
+3. Choose @timestamp as the time field
+
+To verify Elasticsearch is healthy:
+
+  kubectl exec -it <elasticsearch-pod> -- curl http://localhost:9200/_cluster/health?pretty
+
+To run Helm tests:
+
+  helm test {{ .Release.Name }}
+
+To clean up:
+
+  helm uninstall {{ .Release.Name }}

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: elasticsearch
+spec:
+  serviceName: "elasticsearch"
+  replicas: {{ .Values.elasticsearch.replicas }}
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: {{ .Values.elasticsearch.image }}
+        ports:
+        - containerPort: 9200
+        env:
+        - name: discovery.type
+          value: single-node

@@ -1,0 +1,61 @@
+---
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Ensure swap is disabled permanently
+  replace:
+    path: /etc/fstab
+    regexp: '(^.*swap.*$)'
+    replace: '# \1'
+
+- name: Install required packages
+  apt:
+    name: [
+      # 
+      apt-transport-https, 
+      # Need for the Kubelet to authenticate CA from Kubernet API server
+      ca-certificates, 
+      # Need for 
+      curl, 
+      # 
+      software-properties-common
+    ]
+    state: present
+    update_cache: yes
+
+- name: Add Kubernetes APT key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes APT repo
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes
+
+- name: Install kubelet, kubeadm and kubectl
+  apt:
+    name: [
+      kubelet, 
+      kubeadm, 
+      kubectl
+    ]
+    state: present
+    update_cache: yes
+
+- name: Hold kubelet, kubeadm and kubectl at current version
+  apt:
+    name: [
+      kubelet, 
+      kubeadm, 
+      kubectl
+    ]
+    state: hold
+
+- name: Enable and start kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started

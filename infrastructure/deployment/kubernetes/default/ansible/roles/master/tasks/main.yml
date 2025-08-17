@@ -1,0 +1,36 @@
+---
+- name: Initialize the cluster using kubeadm
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  args:
+    creates: /etc/kubernetes/admin.conf
+  register: kubeadm_init
+
+- name: Create .kube directory
+  file:
+    path: /root/.kube
+    state: directory
+    mode: 0700
+
+- name: Copy admin.conf to .kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Install Flannel network plugin
+  command: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Get join command
+  command: kubeadm token create --print-join-command
+  register: join_cmd
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Save join command
+  set_fact:
+    worker_join_command: "{{ join_cmd.stdout }}"
